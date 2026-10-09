@@ -1,0 +1,6 @@
+github.com/containerd/cgroups/v2 v2.0.0-20221109034041-cc78c6c1e32d h1:gfwJ/MHZGr5PdfUf2oMZjbJyPhKIIN1m46Sdm1FIodM=
+github.com/containerd/cgroups/v2 v2.0.0-20221109034041-cc78c6c1e32d/go.mod h1:nno7catpBPPU5fP1B4f1c1B5B5v8VTs+U2z62ZsTzSE=
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+golang.org/x/sys v0.0.0-20210906170528-6f6e22806c34 h1:GkvMjFtXUmahfDtashnc1mnrCtuBVcwse5QV2lUk/tI=
+golang.org/x/sys v0.0.0-20210906170528-6f6e22806c34/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
