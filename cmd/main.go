@@ -6,7 +6,8 @@ import (
 	"os/exec"
 	"syscall"
 
-	cgroupsv2 "github.com/containerd/cgroups/v2"
+	"github.com/containerd/cgroups/v3/cgroup2"
+	"github.com/opencontainers/runtime-spec/specs-go"
 )
 
 func main() {
@@ -19,14 +20,36 @@ func main() {
 	}
 }
 
-func createCgroup() {
-	res := cgroupsv2.Resources{}
+func createCgroup() *cgroup2.Manager {
+	memoryMax := int64(1024 * 1024 * 1024)
+	cpuQuota := int64(100000)
+	cpuPeriod := uint64(100000)
+	pidsMax := int64(100)
 
-	m, err := cgroupsv2.NewSystemd("/", "crt-custom", -1, &res)
+	resources := cgroup2.Resources{
+		Memory: &cgroup2.Memory{
+			Max: &memoryMax,
+		},
+		CPU: &cgroup2.CPU{
+			Max: cgroup2.NewCPUMax(&cpuQuota, &cpuPeriod),
+		},
+		Pids: &cgroup2.Pids{
+			Max: pidsMax,
+		},
+	}
+
+	manager, err := cgroup2.NewManager(
+		"/sys/fs/cgroup/",
+		"/crtCont",
+		&resources,
+	)
 
 	if err != nil {
-		painc(err)
+		panic(err)
+
 	}
+
+	return manager
 
 }
 
