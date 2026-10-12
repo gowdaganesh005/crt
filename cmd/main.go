@@ -7,7 +7,6 @@ import (
 	"syscall"
 
 	"github.com/containerd/cgroups/v3/cgroup2"
-	"github.com/opencontainers/runtime-spec/specs-go"
 )
 
 func main() {
@@ -20,11 +19,14 @@ func main() {
 	}
 }
 
-func createCgroup() *cgroup2.Manager {
+func createCgroup() (*cgroup2.Manager, string) {
 	memoryMax := int64(1024 * 1024 * 1024)
 	cpuQuota := int64(100000)
 	cpuPeriod := uint64(100000)
 	pidsMax := int64(100)
+
+	cgMount := "/sys/fs/cgroup"
+	cgGroup := "/contCrt"
 
 	resources := cgroup2.Resources{
 		Memory: &cgroup2.Memory{
@@ -39,8 +41,8 @@ func createCgroup() *cgroup2.Manager {
 	}
 
 	manager, err := cgroup2.NewManager(
-		"/sys/fs/cgroup/",
-		"/crtCont",
+		cgMount,
+		cgGroup,
 		&resources,
 	)
 
@@ -49,7 +51,7 @@ func createCgroup() *cgroup2.Manager {
 
 	}
 
-	return manager
+	return manager, cgMount + cgGroup
 
 }
 
@@ -57,13 +59,19 @@ func run() {
 	args := os.Args[2:]
 	fmt.Println(args)
 
+	_, cgPath := createCgroup()
+
+	cgFd, _ := os.Open(cgPath)
+
 	cmd := exec.Command("/proc/self/exe", append([]string{"child"}, args...)...)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID,
+		Cloneflags:  syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID,
+		UseCgroupFD: true,
+		CgroupFD:    int(cgFd.Fd()),
 	}
 
 	pid := os.Getpid()
